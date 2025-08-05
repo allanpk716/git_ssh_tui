@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/allanpk716/git_ssh_tui/internal/ui"
-	"github.com/charmbracelet/bubbletea"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
