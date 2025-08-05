@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/allanpk716/git_ssh_tui/internal/config"
 	"github.com/charmbracelet/bubbles/list"
@@ -389,11 +390,20 @@ func (m Model) updateInputs(msg tea.Msg) tea.Cmd {
 
 // submitForm 提交表单
 func (m Model) submitForm() (tea.Model, tea.Cmd) {
+	// 处理 IdentityFile 路径
+	identityFile := m.form.inputs[3].Value()
+	// 移除开头的 ?
+	if len(identityFile) > 0 && identityFile[0] == '?' {
+		identityFile = identityFile[1:]
+	}
+	// 将反斜杠转换为正斜杠
+	identityFile = strings.ReplaceAll(identityFile, "\\", "/")
+
 	host := config.SSHHost{
 		Host:         m.form.inputs[0].Value(),
 		HostName:     m.form.inputs[1].Value(),
 		User:         m.form.inputs[2].Value(),
-		IdentityFile: m.form.inputs[3].Value(),
+		IdentityFile: identityFile,
 	}
 
 	// 验证必填字段
