@@ -102,8 +102,12 @@ func (m Model) renderForm() string {
 	form.WriteString(m.renderFormField("User:", m.form.inputs[2], 2))
 	form.WriteString("\n")
 
+	// Port 字段
+	form.WriteString(m.renderFormField("Port:", m.form.inputs[3], 3))
+	form.WriteString("\n")
+
 	// IdentityFile 字段
-	form.WriteString(m.renderFormField("IdentityFile:", m.form.inputs[3], 3))
+	form.WriteString(m.renderFormField("IdentityFile:", m.form.inputs[4], 4))
 	form.WriteString("\n\n")
 
 	// 提交按钮
@@ -185,17 +189,23 @@ func (m Model) deleteConfirmView() string {
 		host := hosts[m.deleteIndex]
 
 		// 确认对话框内容
+		portInfo := ""
+		if host.Port != "" {
+			portInfo = fmt.Sprintf("Port: %s\n", host.Port)
+		}
 		dialogContent := fmt.Sprintf(
 			"确定要删除以下 SSH 配置吗？\n\n"+
 				"Host: %s\n"+
 				"HostName: %s\n"+
 				"User: %s\n"+
+				"%s"+
 				"IdentityFile: %s\n\n"+
 				"此操作无法撤销！\n\n"+
 				"[Y] 确认删除    [N] 取消",
 			host.Host,
 			host.HostName,
 			host.User,
+			portInfo,
 			host.IdentityFile,
 		)
 

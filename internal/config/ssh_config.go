@@ -13,6 +13,7 @@ type SSHHost struct {
 	Host         string
 	HostName     string
 	User         string
+	Port         string
 	IdentityFile string
 }
 
@@ -97,6 +98,10 @@ func (c *SSHConfig) Load() error {
 			if currentHost != nil {
 				currentHost.User = value
 			}
+		case "port":
+			if currentHost != nil {
+				currentHost.Port = value
+			}
 		case "identityfile":
 			if currentHost != nil {
 				currentHost.IdentityFile = value
@@ -126,6 +131,9 @@ func (c *SSHConfig) Save() error {
 		}
 		if host.User != "" {
 			fmt.Fprintf(file, "    User %s\n", host.User)
+		}
+		if host.Port != "" {
+			fmt.Fprintf(file, "    Port %s\n", host.Port)
 		}
 		if host.IdentityFile != "" {
 			fmt.Fprintf(file, "    IdentityFile %s\n", host.IdentityFile)

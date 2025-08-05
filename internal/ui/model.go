@@ -41,6 +41,7 @@ type FormModel struct {
 	hostInput         textinput.Model
 	hostnameInput     textinput.Model
 	userInput         textinput.Model
+	portInput         textinput.Model
 	identityFileInput textinput.Model
 	focusIndex        int
 	inputs            []textinput.Model
@@ -117,6 +118,12 @@ func NewFormModel() FormModel {
 	userInput.CharLimit = 50
 	userInput.Width = 30
 
+	// Port 输入框
+	portInput := textinput.New()
+	portInput.Placeholder = "例如: 22 (默认可留空)"
+	portInput.CharLimit = 10
+	portInput.Width = 30
+
 	// IdentityFile 输入框
 	identityFileInput := textinput.New()
 	identityFileInput.Placeholder = "例如: ~/.ssh/id_rsa"
@@ -124,12 +131,13 @@ func NewFormModel() FormModel {
 	identityFileInput.Width = 50
 
 	// 创建inputs数组，直接引用上面创建的输入框
-	inputs := []textinput.Model{hostInput, hostnameInput, userInput, identityFileInput}
+	inputs := []textinput.Model{hostInput, hostnameInput, userInput, portInput, identityFileInput}
 
 	return FormModel{
 		hostInput:         hostInput,
 		hostnameInput:     hostnameInput,
 		userInput:         userInput,
+		portInput:         portInput,
 		identityFileInput: identityFileInput,
 		focusIndex:        0,
 		inputs:            inputs,
@@ -214,13 +222,15 @@ func (m Model) createFormWithData(index int) FormModel {
 	form.hostInput.SetValue(host.Host)
 	form.hostnameInput.SetValue(host.HostName)
 	form.userInput.SetValue(host.User)
+	form.portInput.SetValue(host.Port)
 	form.identityFileInput.SetValue(host.IdentityFile)
 
 	// 同时更新inputs数组
 	form.inputs[0].SetValue(host.Host)
 	form.inputs[1].SetValue(host.HostName)
 	form.inputs[2].SetValue(host.User)
-	form.inputs[3].SetValue(host.IdentityFile)
+	form.inputs[3].SetValue(host.Port)
+	form.inputs[4].SetValue(host.IdentityFile)
 
 	return form
 }
@@ -268,8 +278,8 @@ func (m Model) updateAddView(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 		// 检查 IdentityFile 警告
-		if m.form.focusIndex == 3 { // IdentityFile 输入框
-			identityFile := m.form.inputs[3].Value()
+		if m.form.focusIndex == 4 { // IdentityFile 输入框
+			identityFile := m.form.inputs[4].Value()
 			if identityFile != "" {
 				if valid, warning := config.ValidateIdentityFile(identityFile); !valid {
 					m.warning = warning
@@ -331,8 +341,8 @@ func (m Model) updateEditView(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 		// 检查 IdentityFile 警告
-		if m.form.focusIndex == 3 { // IdentityFile 输入框
-			identityFile := m.form.inputs[3].Value()
+		if m.form.focusIndex == 4 { // IdentityFile 输入框
+			identityFile := m.form.inputs[4].Value()
 			if identityFile != "" {
 				if valid, warning := config.ValidateIdentityFile(identityFile); !valid {
 					m.warning = warning
@@ -391,7 +401,7 @@ func (m Model) updateInputs(msg tea.Msg) tea.Cmd {
 // submitForm 提交表单
 func (m Model) submitForm() (tea.Model, tea.Cmd) {
 	// 处理 IdentityFile 路径
-	identityFile := m.form.inputs[3].Value()
+	identityFile := m.form.inputs[4].Value()
 	// 移除开头的 ?
 	if len(identityFile) > 0 && identityFile[0] == '?' {
 		identityFile = identityFile[1:]
@@ -403,6 +413,7 @@ func (m Model) submitForm() (tea.Model, tea.Cmd) {
 		Host:         m.form.inputs[0].Value(),
 		HostName:     m.form.inputs[1].Value(),
 		User:         m.form.inputs[2].Value(),
+		Port:         m.form.inputs[3].Value(),
 		IdentityFile: identityFile,
 	}
 
